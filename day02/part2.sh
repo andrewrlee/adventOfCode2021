@@ -1,7 +1,5 @@
 #!/usr/bin/env bb -i
 
-(require '[clojure.string :as str])
-
 (def initial-state { :hp 0 :depth: 0 :aim 0 })
 
 (def directions { 
