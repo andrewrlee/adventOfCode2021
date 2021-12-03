@@ -15,5 +15,5 @@
    (map #(str/split % #"\s+"))	
    (map (fn [[dir mag]] (partial (directions dir) (Integer/parseInt mag))))
    ((fn [operations] ((apply comp (reverse operations)) initial-state)))
-   ((fn [{ :keys [depth hp]}] (* depth hp)))
+   ((fn [{depth :depth}] depth ))
 )
