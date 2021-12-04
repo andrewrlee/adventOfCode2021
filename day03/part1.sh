@@ -1,18 +1,25 @@
 #!/usr/bin/env bb -i
 
-initial-state (fn [n] (take n (repeatedly (constantly 0))))
-            
+(defn read-binary-to-digits [s]
+  " '1010' -> [1 0 1 0] "
+  (map #(Character/digit % 10) (seq (char-array s))))
 
-(let 
-           [read-bin  (fn [s] (map #(Character/digit % 10) (seq (char-array s))))
-            op-map { 0 dec 1 inc }
-            next-mapping (fn [next] (map #(op-map %) (read-bin next)))
-            initial-state [0 0 0 0 0 0 0 0 0 0 0 0]
-            apply-next-mapping (fn [state, next] (map (fn [a b] (a b)) (next-mapping next) state))
-            readValue (fn [input pred]  (Integer/parseInt (str/join (map #(if (pred %) 1 0) input)) 2))
-            intermediate-result (reduce #(apply-next-mapping %1 %2) initial-state *input*)
-            most-common (readValue intermediate-result pos-int?)
-            least-common (readValue intermediate-result neg-int?)  ]
-              (* most-common least-common)
-        )
+(defn read-as-int [ns pred]
+  " [3 1 3 6] #(= n 3) -> 1010 -> 1111110010 "
+  (Integer/parseInt (str/join (map #(if (pred %) 1 0) ns)) 2)) 
+
+(defn to-adjusters [ns] 
+  " [0 1 0 1] -> [dec inc dec inc]" 
+  (let [op-map { 0 dec 1 inc }] (map #(op-map %) (read-binary-to-digits ns))))            
+
+(def input (seq *input*))
+
+(def initial-state (take (count (first input)) (repeatedly (constantly 0))))	
+
+(let [
+       adjust               (fn [state, next] (map #(%1 %2) (to-adjusters next) state))
+       intermediate-result  (reduce adjust initial-state input)
+       most-common          (read-as-int intermediate-result pos-int?)
+       least-common         (read-as-int intermediate-result neg-int?)]
+         (* most-common least-common))
 
