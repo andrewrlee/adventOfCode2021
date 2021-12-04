@@ -5,8 +5,8 @@
       day    (first *command-line-args*)
       folder (str "./" day)
       {out :out, err :err}   (select-keys 
-               (shell/sh "bash" "-c" (str "cat " folder "/input.txt | " folder "/" part ".sh")) 
-               [:out :err])]
+               (shell/sh "bash" "-c" (str "cat " folder "/input.txt | " folder "/" part ".clj"))
+	       [:out :err])]
       (str (str/trim out) (str/trim err))
    ))
 
