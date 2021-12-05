@@ -28,4 +28,4 @@
 (->> 
   *input*
   (map #(read-binary-to-digits %)) 
-  ( #(* (find oxygen %) (find co2-scrubber %)) )
+  ( #(* (find oxygen %) (find co2-scrubber %))) )
