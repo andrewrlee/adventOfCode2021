@@ -19,9 +19,9 @@
      (filter #(not= (count %) 1))
      (map read-grid)))
 
-(defn find-match [numbers strips] 
-  (letfn [(is-strip-complete? [numbers strip] (every? #(contains? (set numbers) %) strip))]
-    (some #(is-strip-complete? numbers %) strips)))
+(defn find-match [numbers rows] 
+  (letfn [(is-complete? [numbers row] (every? #(contains? (set numbers) %) row))]
+    (some #(is-complete? numbers %) rows)))
 
 (defn is-bingo? [numbers grid] 
   (if (or (find-match numbers grid) (find-match numbers (transpose grid))) :winners :still-in-play))
@@ -30,7 +30,8 @@
    (clojure.set/difference (set (flatten grid)) (set called-numbers)))
 
 (defn bingo-score [grid called-numbers this-number] 
-  (* this-number (apply + (unmarked-numbers grid called-numbers))))
+  (let [unmarked-numbers (clojure.set/difference (set (flatten grid)) (set called-numbers))] 
+    (* this-number (apply + unmarked-numbers))))
   
 (defn play
   ([] (play grids [] numbers []))
@@ -41,7 +42,7 @@
      (let [called-numbers                   (conj called this-number)
            {:keys [winners still-in-play]}  (group-by #(is-bingo? called-numbers %) remaining-grids)
            these-winners                    (map #(bingo-score % called-numbers this-number) winners)]
-             (play still-in-play called-numbers remaining-numbers (concat results these-winners))))))
+       (play still-in-play called-numbers remaining-numbers (concat results these-winners))))))
 
 (last (play))
 
