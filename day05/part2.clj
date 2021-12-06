@@ -15,11 +15,8 @@
      (take-while #(not= % end))
      ( #(concat % [end]) ))))
 
-(defn not-diagonal? [[[x1 y1] [x2 y2]]] (or (= x1 x2) (= y1 y2)))
-
 (->> *input*
   (map read-points)
-  (filter not-diagonal?)
   (mapcat points-between)
   (frequencies)
   (filter #(> (second %) 1))
