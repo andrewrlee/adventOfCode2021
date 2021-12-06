@@ -1,16 +1,19 @@
 #!/usr/bin/env bb -i
 
-(defn grow [n] (if (= n 0) [6 8] [(dec n)])) 
+(def days (vec (take 9 (repeat 0))))
 
+(defn create-day-counts [col] (reduce #(update %1 %2 inc) days col))
 
-  
-(count (last (take 81 (iterate #(mapcat grow %) [3 4 3 1 2]))))
+(defn day [[zero & rest]]
+  (let [new-items (conj (vec rest) zero)]
+   (update new-items 6 #(+ zero %))))
+
 
 (->> (first *input*)
      ( #(str/split % #",") )
-     (map #(Integer/parseInt %)) 
-     (iterate #(mapcat grow %))
+     (map #(Integer/parseInt %))
+     (create-day-counts) 
+     (iterate day)
      (take 81) 
      (last)
-     (count)    
-)
+     (reduce +))
