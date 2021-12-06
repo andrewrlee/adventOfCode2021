@@ -8,7 +8,6 @@
   (let [new-items (conj (vec rest) zero)]
    (update new-items 6 #(+ zero %))))
 
-
 (->> (first *input*)
      ( #(str/split % #",") )
      (map #(Integer/parseInt %))
