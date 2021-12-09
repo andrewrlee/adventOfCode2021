@@ -35,8 +35,7 @@
 (defn process-line [line]
   (->> 
      line 
-     ( #(str/split % #"\|") )
-     (map #(str/trim %))
+     ( #(str/split % #" \| ") )
      (map #(str/split % #"\s+"))
      (decode)
      (#(Integer/parseInt %))))
