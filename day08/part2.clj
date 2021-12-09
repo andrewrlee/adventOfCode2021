@@ -17,22 +17,20 @@
         
         six-char-length (filter (has-length 6) language)
         six   (find-with six-char-length (does-not-contain one))
-        zero  (find-with six-char-length (fn [s] (and ((contains one)s ) ((does-not-contain four) s))))
+        zero  (find-with six-char-length (fn [s] (and ((contains one) s) ((does-not-contain four) s))))
         nine  (find-with six-char-length (contains four))
 
         five-char-length (filter (has-length 5) language)
         three (find-with five-char-length (contains one))
-        two   (find-with five-char-length (fn [s] (and (not ((contains one)s)) ((has-in-common 4 six)s))))
+        two   (find-with five-char-length (fn [s] (and (not ((contains one)s)) ((has-in-common 4 six) s))))
         five  (find-with five-char-length (has-in-common 5 six))
         ]
     { zero 0 one 1 two 2 three 3 four 4 five 5 six 6 seven 7 eight 8 nine 9}))
 
-
 (defn decode [[language input]]
-  (let [book (determine-numbers (map set language))
-        code (map set input)]  
-    (apply str (map #(book %) code))
-    ))
+  (let [codex (determine-numbers (map set language))
+        code  (map set input)]  
+    (apply str (map #(codex %) code))))
 
 (defn process-line [line]
   (->> 
@@ -43,7 +41,4 @@
      (decode)
      (#(Integer/parseInt %))))
 
-(->> *input*
-     (map process-line)
-     (reduce +)
-     )
+(->> *input*(map process-line) (reduce +))
