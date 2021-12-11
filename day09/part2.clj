@@ -24,10 +24,9 @@
 (defn add-to-basin [grid]
   (fn [{:keys [seen basins]} point]
     (if (contains? seen point) 
-      {:seen seen }
+      {:seen seen :basins basins }
       (let [basin (find-basin grid seen point)]
-        (println point "###########"  " ! " basin )
-        {:seen (clojure.set/union seen basin) :basins (conj basins basin ) }
+         {:seen (clojure.set/union seen basin) :basins (conj basins basin ) }
       ))))
 
 (->> *input*
@@ -38,4 +37,9 @@
               (filter (fn [[_ value]] (not= 9 value)))
               (map first)
               (reduce (add-to-basin grid) {:seen #{} :basins []})
-              (:basins)))))
+              (:basins)
+              (map count)
+              (sort)
+              (take-last 3)
+              (apply *)
+              ))))
