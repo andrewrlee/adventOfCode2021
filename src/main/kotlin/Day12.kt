@@ -41,6 +41,7 @@ object Day12 {
         fun run() {
             val paths = mutableSetOf<List<String>>()
             countPaths(maze, paths, listOf("start"), false)
+            paths.forEach { println(it) }
             println(paths.size)
         }
 
