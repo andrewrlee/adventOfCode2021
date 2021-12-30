@@ -11,7 +11,7 @@ object Day11 {
         .mapIndexed { col, value -> (row to col) to Octopus((row to col), value) }
 
     val octopusGrid = {
-        File("day11/input-real.txt")
+        File("day11/input-Day11.kt.txt")
             .readLines(defaultCharset())
             .mapIndexed(::toCoordinates)
             .flatten()
