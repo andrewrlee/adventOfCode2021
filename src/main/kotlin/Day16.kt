@@ -1,4 +1,11 @@
+import Day16.Type.EQUAL_TO
+import Day16.Type.G_THAN
 import Day16.Type.LITERAL
+import Day16.Type.L_THAN
+import Day16.Type.MAX
+import Day16.Type.MIN
+import Day16.Type.PRODUCT
+import Day16.Type.SUM
 import java.io.File
 import java.math.BigInteger
 import java.nio.charset.Charset.defaultCharset
@@ -14,15 +21,14 @@ object Day16 {
         LITERAL(4),
         G_THAN(5),
         L_THAN(6),
-        EQUAL_TO(7),
-        ;
+        EQUAL_TO(7);
 
         companion object {
-            fun fromCode(code: Int) = Type.values().first { it.code == code }
+            fun fromCode(code: Int) = values().first { it.code == code }
         }
     }
 
-    fun toBinary(s: String) = BigInteger(s, 16).toString(2).let {
+    private fun String.toBinary() = BigInteger(this, 16).toString(2).let {
         String.format("%4s", it).replace(" ", "0").toCharArray().toList()
     }
 
@@ -49,13 +55,13 @@ object Day16 {
     ) : Packet(version, type) {
         override fun getTotalVersion() = version + (payload.sumOf { it.getTotalVersion() })
         override fun evaluate() = when (type) {
-            Type.SUM -> payload.sumOf { it.evaluate() }
-            Type.PRODUCT -> payload.fold(1L) { acc, i -> acc * i.evaluate() }
-            Type.MIN -> payload.minOf { it.evaluate() }
-            Type.MAX -> payload.maxOf { it.evaluate() }
-            Type.G_THAN -> if (payload[0].evaluate() > payload[1].evaluate()) 1 else 0
-            Type.L_THAN ->  if (payload[0].evaluate() < payload[1].evaluate()) 1 else 0
-            Type.EQUAL_TO -> if (payload[0].evaluate() == payload[1].evaluate()) 1 else 0
+            SUM -> payload.sumOf { it.evaluate() }
+            PRODUCT -> payload.fold(1L) { acc, i -> acc * i.evaluate() }
+            MIN -> payload.minOf { it.evaluate() }
+            MAX -> payload.maxOf { it.evaluate() }
+            G_THAN -> if (payload[0].evaluate() > payload[1].evaluate()) 1 else 0
+            L_THAN -> if (payload[0].evaluate() < payload[1].evaluate()) 1 else 0
+            EQUAL_TO -> if (payload[0].evaluate() == payload[1].evaluate()) 1 else 0
             else -> throw RuntimeException("unexpected type")
         }
     }
@@ -107,32 +113,22 @@ object Day16 {
             val string = readString(length)
             return Integer.parseInt(string, 2)
         }
-
-        fun finishHexChar() {
-            val index = input.indexOf('%')
-            input = input.subList(index + 1, input.size)
-        }
     }
 
-
-    private fun readPackets(input: BinaryString): MutableList<Day16.Packet> {
+    private fun readPackets(input: BinaryString): MutableList<Packet> {
         val packets = mutableListOf<Packet>()
         while (input.isNotEmpty()) {
-            val packet = readPacket(input, false)
-            packets.add(packet)
+            packets.add(input.readPacket())
         }
         return packets
     }
 
-
-    private fun readPacket(input: BinaryString, trim: Boolean = false): Packet {
-        val version = input.readInt(3)
-        val packet = when (val type = Type.fromCode(input.readInt(3))) {
-            LITERAL -> readLiteral(version, input)
-            else -> readOperator(version, type, input)
+    private fun BinaryString.readPacket(): Packet {
+        val version = this.readInt(3)
+        return when (val type = Type.fromCode(this.readInt(3))) {
+            LITERAL -> readLiteral(version, this)
+            else -> readOperator(version, type, this)
         }
-        if (trim) input.finishHexChar()
-        return packet
     }
 
     private fun readOperator(version: Int, type: Type, input: BinaryString): Packet {
@@ -143,9 +139,7 @@ object Day16 {
             }
             "1" -> {
                 val numberOfPackets = input.readInt(11)
-                (0..numberOfPackets - 1).map {
-                    readPacket(input)
-                }
+                (0 until numberOfPackets).map { input.readPacket() }
             }
             else -> throw RuntimeException("unexpected val")
         }
@@ -164,30 +158,24 @@ object Day16 {
         return Literal(version, value)
     }
 
+    val input = {
+        File("day16/input-real.txt")
+            .readText(defaultCharset())
+            .map { it.toString().toBinary() }
+            .flatMap { it + '%' }
+            .let { BinaryString(it) }
+    }
+
     object Part1 {
-        fun run() {
-            val inline =
-                File("day16/input-real.txt").readText(defaultCharset()).map { toBinary(it.toString()) }.toList()
-
-            val input = BinaryString(inline.flatMap { it + '%' })
-
-            println(readPacket(input).getTotalVersion())
-        }
+        fun run() = println(input().readPacket().getTotalVersion())
     }
 
     object Part2 {
-        fun run() {
-            val inline =
-                File("day16/input-real.txt").readText(defaultCharset()).map { toBinary(it.toString()) }.toList()
-
-            val input = BinaryString(inline.flatMap { it + '%' })
-
-            val packet = readPacket(input)
-            println(packet.evaluate())
-        }
+        fun run() = println(input().readPacket().evaluate())
     }
 }
 
 fun main() {
+    Day16.Part1.run()
     Day16.Part2.run()
 }
